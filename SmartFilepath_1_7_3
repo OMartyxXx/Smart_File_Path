@@ -546,6 +546,10 @@ class SETCAMFRAMERANGE_OT_set_camframerange(bpy.types.Operator):
             self.report({'WARNING'}, "La caméra active n'a pas de custom properties Frame Start / Frame End")
         return {'FINISHED'}
 
+class SETMISTPATH_OT_set_set_mist_path(bpy.types.Operator):
+    bl_idname = "scene.set_mistpath"
+    bl_label = "Set Mist Path to Active Camera"
+    bl_description = "Applique la mist actuelle de la scène dans les custom properties de la cam active"
 
 # ------------------------
 # OPERATORS — PREVIEW PATH
@@ -748,6 +752,7 @@ class VIEW3D_PT_CamRigCreator(bpy.types.Panel):
 
         layout.operator("scene.create_camera_rig", icon='CAMERA_DATA')
         layout.operator("scene.set_camfrange", icon='KEYFRAME')
+        layout.operator("scene.set_mistpath", icon='WORLD')
 
 
 class VIEW3D_PT_PreviewPath(bpy.types.Panel):
@@ -803,6 +808,7 @@ classes = (
     SEND_OT_deadline,
     CREATE_RIG_OT_camera_rig,
     SETCAMFRAMERANGE_OT_set_camframerange,
+    SETMISTPATH_OT_set_set_mist_path,
     GREYBOXRENDER_OT_set_greybox_path,
     GREYBOXRENDER_OT_wait_and_open,
     GREYBOXRENDER_OT_viewport_render_animation,
