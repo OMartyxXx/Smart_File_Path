@@ -5,6 +5,8 @@ import json
 import os
 import zipfile
 import shutil
+import importlib
+import sys
 
 # ------------------------------------------------
 # CONFIG — ne pas toucher sauf si le repo change
@@ -59,6 +61,11 @@ class SMARTPATH_OT_check_update(bpy.types.Operator):
     bl_description = "Vérifie si une nouvelle version est disponible sur GitHub"
 
     def execute(self, context):
+        # Forcer le rechargement du module pour avoir le bon token
+        current_module = sys.modules.get(__name__)
+        if current_module:
+            importlib.reload(current_module)
+
         prefs = context.preferences.addons[__package__].preferences
 
         prefs.update_status  = "checking"
