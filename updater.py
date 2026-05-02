@@ -12,7 +12,7 @@ import shutil
 
 GITHUB_USER     = "OMartyxXx"
 GITHUB_REPO     = "Smart_File_Path"
-CURRENT_VERSION = (1, 7, 4)              # ← à mettre à jour à chaque release
+CURRENT_VERSION = (1, 7, 3)              # ← à mettre à jour à chaque release
 
 # ------------------------------------------------
 # HELPERS
@@ -120,12 +120,15 @@ class SMARTPATH_OT_install_update(bpy.types.Operator):
             with zipfile.ZipFile(zip_path, 'r') as z:
                 z.extractall(extract_dir)
 
-            # 4. Trouver le dossier racine dans le zip
-            extracted_items = os.listdir(extract_dir)
-            if len(extracted_items) == 1 and os.path.isdir(os.path.join(extract_dir, extracted_items[0])):
-                source_dir = os.path.join(extract_dir, extracted_items[0])
-            else:
-                source_dir = extract_dir
+            # 4. Trouver le dossier qui contient blender_manifest.toml (récursif)
+            source_dir = None
+            for root, dirs, files in os.walk(extract_dir):
+                if "blender_manifest.toml" in files:
+                    source_dir = root
+                    break
+
+            if source_dir is None:
+                raise FileNotFoundError("blender_manifest.toml introuvable dans le zip")
 
             # 5. Copier les fichiers .py et .toml dans le dossier de l'addon
             for fname in os.listdir(source_dir):
