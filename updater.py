@@ -12,7 +12,7 @@ import shutil
 
 GITHUB_USER     = "OMartyxXx"
 GITHUB_REPO     = "Smart_File_Path"
-CURRENT_VERSION = (1, 7, 3)              # ← à mettre à jour à chaque release
+CURRENT_VERSION = (1, 7, 4)              # ← à mettre à jour à chaque release
 
 # ------------------------------------------------
 # HELPERS

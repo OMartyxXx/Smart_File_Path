@@ -13,7 +13,7 @@ import shutil
 GITHUB_USER     = "OMartyxXx"
 GITHUB_REPO     = "BA-SmartFilePath"
 GITHUB_TOKEN    = "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"
-CURRENT_VERSION = (1, 7, 3)              # ← à mettre à jour à chaque release
+CURRENT_VERSION = (1, 7, 4)              # ← à mettre à jour à chaque release
 
 # ------------------------------------------------
 # HELPERS
