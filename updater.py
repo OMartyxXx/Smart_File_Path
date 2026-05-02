@@ -14,7 +14,7 @@ import sys
 
 GITHUB_USER     = "OMartyxXx"
 GITHUB_REPO     = "Smart_File_Path"
-GITHUB_TOKEN    = "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"
+GITHUB_TOKEN    = "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"
 CURRENT_VERSION = (1, 7, 3)              # ← à mettre à jour à chaque release
 
 # ------------------------------------------------
