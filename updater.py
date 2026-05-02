@@ -54,11 +54,6 @@ class SMARTPATH_OT_check_update(bpy.types.Operator):
     bl_description = "Vérifie si une nouvelle version est disponible sur GitHub"
 
     def execute(self, context):
-        # Forcer le rechargement du module pour avoir le bon token
-        current_module = sys.modules.get(__name__)
-        if current_module:
-            importlib.reload(current_module)
-
         prefs = context.preferences.addons[__package__].preferences
 
         prefs.update_status  = "checking"
@@ -207,6 +202,14 @@ classes = (
 
 
 def register():
+    # Sécurité — supprime le __pycache__ pour éviter les anciennes versions en cache
+    pycache_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "__pycache__")
+    if os.path.exists(pycache_dir):
+        try:
+            shutil.rmtree(pycache_dir)
+        except Exception:
+            pass
+
     for cls in classes:
         bpy.utils.register_class(cls)
 
