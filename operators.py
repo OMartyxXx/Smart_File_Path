@@ -121,8 +121,41 @@ class UPDATEPATH_OT_copy_path(bpy.types.Operator):
 # OPERATORS — DEADLINE
 # ------------------------
 
+def _apply_camera_properties(context):
+    """Applique les custom properties de la caméra active à la scène."""
+    scene     = context.scene
+    activecam = scene.camera
+    applied   = []
+
+    if activecam is None:
+        return applied
+
+    cam_data = activecam.data
+
+    # Frame Range
+    if "Frame Start" in cam_data and "Frame End" in cam_data:
+        scene.frame_start = int(cam_data["Frame Start"])
+        scene.frame_end   = int(cam_data["Frame End"])
+        applied.append(f"Frame Range: {scene.frame_start} → {scene.frame_end}")
+
+    # Mist
+    if "Mist Start" in cam_data and "Mist Depth" in cam_data:
+        if scene.world is None:
+            scene.world = bpy.data.worlds.new(name="World")
+        scene.world.mist_settings.start = float(cam_data["Mist Start"])
+        scene.world.mist_settings.depth = float(cam_data["Mist Depth"])
+        applied.append(f"Mist: {scene.world.mist_settings.start}m → {scene.world.mist_settings.depth}m")
+
+    return applied
+
+
 def _deadline_send(operator, context):
     """Exécute l'envoi à Deadline."""
+    # Appliquer les custom properties de la cam active avant l'envoi
+    applied = _apply_camera_properties(context)
+    for info in applied:
+        operator.report({'INFO'}, f"Cam → Scène : {info}")
+
     bpy.ops.file.make_paths_absolute()
     try:
         bpy.ops.ops.submit_blender_to_deadline()
@@ -229,6 +262,24 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
         layout.label(text="Résumé du job Deadline", icon='RENDER_STILL')
         layout.separator()
 
+        # Lire les custom properties de la cam pour afficher les valeurs qui seront appliquées
+        frame_start = scene.frame_start
+        frame_end   = scene.frame_end
+        mist_start  = scene.world.mist_settings.start if scene.world else 0.0
+        mist_depth  = scene.world.mist_settings.depth if scene.world else 0.0
+        cam_overrides = []
+
+        if scene.camera:
+            cam_data = scene.camera.data
+            if "Frame Start" in cam_data and "Frame End" in cam_data:
+                frame_start = int(cam_data["Frame Start"])
+                frame_end   = int(cam_data["Frame End"])
+                cam_overrides.append("Frame Range")
+            if "Mist Start" in cam_data and "Mist Depth" in cam_data:
+                mist_start = float(cam_data["Mist Start"])
+                mist_depth = float(cam_data["Mist Depth"])
+                cam_overrides.append("Mist")
+
         col = layout.column(align=True)
 
         def info_row(col, label, value, icon):
@@ -237,8 +288,17 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
             split.label(text=value)
 
         info_row(col, "Caméra :",        cam,                                                                        'CAMERA_DATA')
+
+        if cam_overrides:
+            col.separator()
+            box = col.box()
+            box.label(text=f"⚙ Valeurs appliquées par la cam : {', '.join(cam_overrides)}", icon='INFO')
+
         col.separator()
-        info_row(col, "Frame Range :",   f"{scene.frame_start}  →  {scene.frame_end}",                              'KEYFRAME')
+        frame_label = f"{frame_start}  →  {frame_end}"
+        if "Frame Range" in cam_overrides:
+            frame_label += "  (cam)"
+        info_row(col, "Frame Range :",   frame_label,                                                                'KEYFRAME')
         info_row(col, "Frame Rate :",    f"{scene.render.fps} fps",                                                  'TIME')
         col.separator()
         info_row(col, "Résolution :",    f"{scene.render.resolution_x} x {scene.render.resolution_y}  ({scene.render.resolution_percentage} %)", 'RESTRICT_RENDER_OFF')
