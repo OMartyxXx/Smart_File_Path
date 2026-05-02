@@ -5,8 +5,6 @@ import json
 import os
 import zipfile
 import shutil
-import importlib
-import sys
 
 # ------------------------------------------------
 # CONFIG — ne pas toucher sauf si le repo change
@@ -14,7 +12,6 @@ import sys
 
 GITHUB_USER     = "OMartyxXx"
 GITHUB_REPO     = "Smart_File_Path"
-GITHUB_TOKEN    = "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"
 CURRENT_VERSION = (1, 7, 3)              # ← à mettre à jour à chaque release
 
 # ------------------------------------------------
@@ -33,10 +30,7 @@ def _version_tuple(tag: str):
 def _get_latest_release():
     """Interroge l'API GitHub et retourne (tag, zip_url) ou lève une exception."""
     url = f"https://api.github.com/repos/{GITHUB_USER}/{GITHUB_REPO}/releases/latest"
-    req = urllib.request.Request(url, headers={
-        "User-Agent":    "BlenderAddon-SmartFilePath",
-        "Authorization": f"token {GITHUB_TOKEN}",
-    })
+    req = urllib.request.Request(url, headers={"User-Agent": "BlenderAddon-SmartFilePath"})
     with urllib.request.urlopen(req, timeout=10) as resp:
         data = json.loads(resp.read().decode())
 
@@ -45,7 +39,6 @@ def _get_latest_release():
     zip_url = next((a["browser_download_url"] for a in assets if a["name"].endswith(".zip")), None)
 
     if not zip_url:
-        # Fallback : zipball automatique de GitHub
         zip_url = data.get("zipball_url")
 
     return tag, zip_url
@@ -116,10 +109,7 @@ class SMARTPATH_OT_install_update(bpy.types.Operator):
             self.report({'INFO'}, "Téléchargement en cours...")
             req = urllib.request.Request(
                 prefs.download_url,
-                headers={
-                    "User-Agent":    "BlenderAddon-SmartFilePath",
-                    "Authorization": f"token {GITHUB_TOKEN}",
-                }
+                headers={"User-Agent": "BlenderAddon-SmartFilePath"}
             )
             with urllib.request.urlopen(req, timeout=30) as resp, open(zip_path, "wb") as f:
                 shutil.copyfileobj(resp, f)
