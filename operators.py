@@ -504,9 +504,35 @@ class CAMERA_OT_set_active(bpy.types.Operator):
 
     def execute(self, context):
         cam_obj = bpy.data.objects.get(self.camera_name)
+
+        scene       = context.scene
+        active_cam  = scene.camera
+        world       = scene.world
+
+        mist_start  = camera_name.data["Mist Start"]
+        mist_depth  = camera_name.data["Mist Depth"]
+
+        frame_start = camera_name.data["Frame Start"]
+        frame_end   = camera_name.data["Frame End"]
+
         if cam_obj and cam_obj.type == 'CAMERA':
-            context.scene.camera = cam_obj
+
+            if "Mist Start" and "Mist Depth" and "Frame Start" and "Frame End" in active_cam:
+
+                world.mist_settings.start = mist_start
+                world.mist_settings.depth = mist_depth
+
+                scene.frame_start = frame_start
+                scene.frame_end = frame_end
+
+                return {'FINISHED'}
+
+
+            cative_cam = cam_obj
             self.report({'INFO'}, f"Caméra active : {cam_obj.name}")
+
+            
+
         else:
             self.report({'WARNING'}, f"Caméra introuvable : {self.camera_name}")
             return {'CANCELLED'}

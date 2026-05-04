@@ -146,6 +146,7 @@ classes = (
     VIEW3D_PT_FilePath,
     VIEW3D_PT_CamRigCreator,
     VIEW3D_PT_PreviewPath,
+    VIEW3D_PT_camera_switcher,
 )
 
 
