@@ -296,7 +296,7 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
 
         col.separator()
         frame_label = f"{frame_start}  →  {frame_end}"
-        mist_label = f"{mist_start}  →  {mist_depth}"
+        mist_label = f"{mist_start:.2f}  →  {mist_depth:.2f}"
         if "Frame Range" in cam_overrides:
             frame_label += "  (cam)"
         info_row(col, "Frame Range :",   frame_label,                                                                'KEYFRAME')
@@ -377,7 +377,7 @@ class SEND_OT_deadline(bpy.types.Operator):
 
 
 # ------------------------
-# OPERATOR — CAMERA RIG
+# OPERATOR — CAMERA RIG / SWITCHER
 # ------------------------
 
 class CREATE_RIG_OT_camera_rig(bpy.types.Operator):
@@ -492,6 +492,26 @@ class SETMISTPASSE_OT_set_set_mist_passe(bpy.types.Operator):
         else:
             self.report({'WARNING'}, "La caméra active n'a pas de custom properties Frame Start / Frame End")
         return {'FINISHED'}
+
+
+class CAMERA_OT_set_active(bpy.types.Operator):
+    """Définit cette caméra comme caméra active de la scène"""
+    bl_idname = "camera.set_active_from_panel"
+    bl_label = "Set Active Camera"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    camera_name: bpy.props.StringProperty()
+
+    def execute(self, context):
+        cam_obj = bpy.data.objects.get(self.camera_name)
+        if cam_obj and cam_obj.type == 'CAMERA':
+            context.scene.camera = cam_obj
+            self.report({'INFO'}, f"Caméra active : {cam_obj.name}")
+        else:
+            self.report({'WARNING'}, f"Caméra introuvable : {self.camera_name}")
+            return {'CANCELLED'}
+        return {'FINISHED'}
+
 
 
 # ------------------------
@@ -648,6 +668,7 @@ classes = (
     CREATE_RIG_OT_camera_rig,
     SETCAMFRAMERANGE_OT_set_camframerange,
     SETMISTPASSE_OT_set_set_mist_passe,
+    CAMERA_OT_set_active,
     GREYBOXRENDER_OT_set_greybox_path,
     GREYBOXRENDER_OT_wait_and_open,
     GREYBOXRENDER_OT_viewport_render_animation,

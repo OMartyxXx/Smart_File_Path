@@ -53,7 +53,7 @@ class VIEW3D_PT_CamRigCreator(bpy.types.Panel):
     bl_idname = "VIEW3D_PT_camrigcreator"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "SmartPath"
+    bl_category = "Cameras"
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
@@ -69,7 +69,7 @@ class VIEW3D_PT_PreviewPath(bpy.types.Panel):
     bl_idname = "VIEW3D_PT_previewpath"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    bl_category = "SmartPath"
+    bl_category = "Cameras"
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
@@ -100,6 +100,43 @@ class VIEW3D_PT_PreviewPath(bpy.types.Panel):
             pbox.separator()
             pbox.operator("greyboxrender.viewport_render_animation", icon='RENDER_ANIMATION')
 
+
+class VIEW3D_PT_camera_switcher(bpy.types.Panel):
+    """Panel listant toutes les caméras de la scène avec switch rapide."""
+    bl_label = "Cameras"
+    bl_idname = "VIEW3D_PT_camera_switcher"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Cameras"
+
+    def draw(self, context):
+        layout = self.layout
+        scene  = context.scene
+
+        # Récupération des caméras de la scène, triées alphabétiquement
+        cameras = sorted(
+            [obj for obj in scene.objects if obj.type == 'CAMERA'],
+            key=lambda c: c.name.lower()
+        )
+
+        if not cameras:
+            layout.label(text="Aucune caméra dans la scène", icon='INFO')
+            return
+
+        active_cam = scene.camera
+        col = layout.column(align=True)
+
+        for cam in cameras:
+            is_active = (cam == active_cam)
+            row = col.row(align=True)
+            icon = 'OUTLINER_OB_CAMERA' if is_active else 'CAMERA_DATA'
+            op = row.operator(
+                "camera.set_active_from_panel",
+                text=cam.name,
+                icon=icon,
+                depress=is_active
+            )
+            op.camera_name = cam.name
 
 # ------------------------
 # REGISTER
