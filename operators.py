@@ -265,20 +265,8 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
         # Lire les custom properties de la cam pour afficher les valeurs qui seront appliquées
         frame_start = scene.frame_start
         frame_end   = scene.frame_end
-        mist_start  = scene.world.mist_settings.start if scene.world else 0.0
-        mist_depth  = scene.world.mist_settings.depth if scene.world else 0.0
-        cam_overrides = []
-
-        if scene.camera:
-            cam_data = scene.camera.data
-            if "Frame Start" in cam_data and "Frame End" in cam_data:
-                frame_start = int(cam_data["Frame Start"])
-                frame_end   = int(cam_data["Frame End"])
-                cam_overrides.append("Frame Range")
-            if "Mist Start" in cam_data and "Mist Depth" in cam_data:
-                mist_start = float(cam_data["Mist Start"])
-                mist_depth = float(cam_data["Mist Depth"])
-                cam_overrides.append("Mist")
+        mist_start  = scene.world.mist_settings.start
+        mist_depth  = scene.world.mist_settings.depth
 
         col = layout.column(align=True)
 
@@ -289,16 +277,7 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
 
         info_row(col, "Caméra :",        cam,                                                                        'CAMERA_DATA')
 
-        if cam_overrides:
-            col.separator()
-            box = col.box()
-            box.label(text=f"⚙ Valeurs appliquées par la cam : {', '.join(cam_overrides)}", icon='INFO')
-
-        col.separator()
-        frame_label = f"{frame_start}  →  {frame_end}"
-        mist_label = f"{mist_start:.2f}  →  {mist_depth:.2f}"
-        if "Frame Range" in cam_overrides:
-            frame_label += "  (cam)"
+        
         info_row(col, "Frame Range :",   frame_label,                                                                'KEYFRAME')
         info_row(col, "Mist:",   mist_label,                                                                'WORLD')
         info_row(col, "Frame Rate :",    f"{scene.render.fps} fps",                                                  'TIME')
@@ -516,7 +495,7 @@ class CAMERA_OT_set_active(bpy.types.Operator):
         frame_end   = camera_name.data["Frame End"]
 
         if cam_obj and cam_obj.type == 'CAMERA':
-
+            
             if "Mist Start" and "Mist Depth" and "Frame Start" and "Frame End" in active_cam:
 
                 world.mist_settings.start = mist_start
@@ -528,7 +507,7 @@ class CAMERA_OT_set_active(bpy.types.Operator):
                 return {'FINISHED'}
 
 
-            cative_cam = cam_obj
+            active_cam = cam_obj
             self.report({'INFO'}, f"Caméra active : {cam_obj.name}")
 
             
