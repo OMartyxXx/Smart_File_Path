@@ -296,9 +296,11 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
 
         col.separator()
         frame_label = f"{frame_start}  →  {frame_end}"
+        mist_label = f"{mist_start}  →  {mist_depth}"
         if "Frame Range" in cam_overrides:
             frame_label += "  (cam)"
         info_row(col, "Frame Range :",   frame_label,                                                                'KEYFRAME')
+        info_row(col, "Mist:",   mist_label,                                                                'WORLD')
         info_row(col, "Frame Rate :",    f"{scene.render.fps} fps",                                                  'TIME')
         col.separator()
         info_row(col, "Résolution :",    f"{scene.render.resolution_x} x {scene.render.resolution_y}  ({scene.render.resolution_percentage} %)", 'RESTRICT_RENDER_OFF')
