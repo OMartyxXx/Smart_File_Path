@@ -435,7 +435,7 @@ class SETCAMFRAMERANGE_OT_set_camframerange(bpy.types.Operator):
             self.report({'WARNING'}, "Aucune caméra active dans la scène")
             return {'CANCELLED'}
 
-        if "Frame Start" and "Frame End" in activecam.data:
+        if "Frame Start" in activecam.data and "Frame End" in activecam.data:
             activecam.data["Frame Start"] = scene.frame_start
             activecam.data["Frame End"]   = scene.frame_end
             activecam.data.update_tag()
@@ -447,7 +447,7 @@ class SETCAMFRAMERANGE_OT_set_camframerange(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class SETMISTPASSE_OT_set_set_mist_passe(bpy.types.Operator):
+class SETMISTPASSE_OT_set_mist_passe(bpy.types.Operator):
     bl_idname = "scene.set_mistpasse"
     bl_label = "Set Mist Path to Active Camera"
     bl_description = "Applique la mist actuelle de la scène dans les custom properties de la cam active"
@@ -461,7 +461,7 @@ class SETMISTPASSE_OT_set_set_mist_passe(bpy.types.Operator):
             self.report({'WARNING'}, "Aucune caméra active dans la scène")
             return {'CANCELLED'}
 
-        if "Mist Start" and "Mist Depth" in activecam.data:
+        if "Mist Start" in activecam.data and "Mist Depth" in activecam.data:
             activecam.data["Mist Start"] = world.mist_settings.start
             activecam.data["Mist Depth"] = world.mist_settings.depth
             activecam.data.update_tag()
@@ -482,6 +482,12 @@ class CAMERA_OT_set_active(bpy.types.Operator):
     camera_name: bpy.props.StringProperty()
 
     def execute(self, context):
+        
+        if world is None:
+            self.report({'WARNING'}, "Aucun world dans la scéne")
+            return {'CANCELLED'}
+
+
         cam_obj = bpy.data.objects.get(self.camera_name)
 
         scene       = context.scene
@@ -496,7 +502,7 @@ class CAMERA_OT_set_active(bpy.types.Operator):
 
         if cam_obj and cam_obj.type == 'CAMERA':
             
-            if "Mist Start" and "Mist Depth" and "Frame Start" and "Frame End" in active_cam:
+            if "Mist Start" and "Mist Depth" and "Frame Start" and "Frame End" in active_cam.data:
 
                 world.mist_settings.start = mist_start
                 world.mist_settings.depth = mist_depth
@@ -672,7 +678,7 @@ classes = (
     SEND_OT_deadline,
     CREATE_RIG_OT_camera_rig,
     SETCAMFRAMERANGE_OT_set_camframerange,
-    SETMISTPASSE_OT_set_set_mist_passe,
+    SETMISTPASSE_OT_set_mist_passe,
     CAMERA_OT_set_active,
     GREYBOXRENDER_OT_set_greybox_path,
     GREYBOXRENDER_OT_wait_and_open,
