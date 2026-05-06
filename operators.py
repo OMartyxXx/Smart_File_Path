@@ -268,6 +268,9 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
         mist_start  = scene.world.mist_settings.start
         mist_depth  = scene.world.mist_settings.depth
 
+        frame_label = f"{frame_start}  →  {frame_end}"
+        mist_label  = f"{mist_start}  →  {mist_depth}"
+        
         col = layout.column(align=True)
 
         def info_row(col, label, value, icon):
@@ -461,6 +464,11 @@ class SETMISTPASSE_OT_set_mist_passe(bpy.types.Operator):
             self.report({'WARNING'}, "Aucune caméra active dans la scène")
             return {'CANCELLED'}
 
+        if world is None:
+            self.report({'WARNING'}, "Aucune world dans la scène")
+            return {'CANCELLED'}
+            
+
         if "Mist Start" in activecam.data and "Mist Depth" in activecam.data:
             activecam.data["Mist Start"] = world.mist_settings.start
             activecam.data["Mist Depth"] = world.mist_settings.depth
@@ -483,16 +491,19 @@ class CAMERA_OT_set_active(bpy.types.Operator):
 
     def execute(self, context):
         
-        if world is None:
-            self.report({'WARNING'}, "Aucun world dans la scéne")
-            return {'CANCELLED'}
-
-
         cam_obj = bpy.data.objects.get(self.camera_name)
 
         scene       = context.scene
         active_cam  = scene.camera
-        acd         = active_cam.data #nom plus court pour la vérif plus bas
+        
+        if world is None:
+            self.report({'WARNING'}, "Aucun world dans la scéne")
+            return {'CANCELLED'}
+
+        if active_cam id None:
+            self.report({'CANCELLED'}, "Aucune caméra active dans la scène")
+        
+        cod         = cam_obj.data #cod pour cam_object_data : nom plus court pour la vérif plus bas
         world       = scene.world
 
 
