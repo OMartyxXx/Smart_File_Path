@@ -9,7 +9,6 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
-    bl_options = {'DEFAULT_OPEN'}
 
 
     def draw(self, context):
@@ -47,7 +46,6 @@ class VIEW3D_PT_CamRigCreator(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
-    bl_options = {'DEFAULT_OPEN'}
 
     def draw(self, context):
         layout = self.layout
