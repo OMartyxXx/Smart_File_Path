@@ -2,7 +2,7 @@ schema_version = "1.0.0"
 
 id = "Smart_File_Path"
 name = "SmartFilePath"
-version = "1.8.1"
+version = "1.8.2"
 tagline = "Outil de setup des chemins de rendu"
 maintainer = "marting.lebrun@gmail.com"
 type = "add-on"

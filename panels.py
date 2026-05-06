@@ -62,23 +62,12 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
                 row.label(text="Mist :", icon='WORLD')
                 row.label(text=f"{ms:.2f}m  →  {md:.2f}m")
 
-
-        
-
-class VIEW3D_PT_CamRigCreator(bpy.types.Panel):
-    bl_label = "Create Cam Rig"
-    bl_idname = "VIEW3D_PT_camrigcreator"
-    bl_space_type = 'VIEW_3D'
-    bl_region_type = 'UI'
-    bl_category = "SmartPath"
-    bl_order = 1
-
-    def draw(self, context):
-        layout = self.layout
-
+        layout.separator()
         layout.operator("scene.create_camera_rig", icon='CAMERA_DATA')
         layout.operator("scene.set_camfrange", icon='KEYFRAME')
         layout.operator("scene.set_mistpasse", icon='WORLD')
+
+
 
 class VIEW3D_PT_PreviewPath(bpy.types.Panel):
     bl_label = "Preview Path Tool"
@@ -86,8 +75,9 @@ class VIEW3D_PT_PreviewPath(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
-    bl_order = 2
     bl_options = {'DEFAULT_CLOSED'}
+    bl_order = 1
+
 
     def draw(self, context):
         layout = self.layout
@@ -125,8 +115,9 @@ class VIEW3D_PT_FilePath(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
-    bl_order = 3
     bl_options = {'DEFAULT_CLOSED'}
+    bl_order = 2
+
 
     def draw(self, context):
         layout = self.layout
@@ -173,7 +164,6 @@ class VIEW3D_PT_FilePath(bpy.types.Panel):
 
 classes = (
     VIEW3D_PT_camera_switcher,
-    VIEW3D_PT_CamRigCreator,
     VIEW3D_PT_PreviewPath,
     VIEW3D_PT_FilePath,
 )
