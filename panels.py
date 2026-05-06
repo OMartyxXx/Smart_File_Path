@@ -5,7 +5,7 @@ from .utils import draw_section
 class VIEW3D_PT_camera_switcher(bpy.types.Panel):
     """Panel listant toutes les caméras de la scène avec switch rapide."""
     bl_label = "Cam Switcher"
-    bl_idname = "VIEW3D_PT_camera_switcher"
+    bl_idname = "VIEW3D_PT_1_camera_switcher"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
@@ -77,7 +77,7 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
 
 class VIEW3D_PT_PreviewPath(bpy.types.Panel):
     bl_label = "Preview Path Tool"
-    bl_idname = "VIEW3D_PT_previewpath"
+    bl_idname = "VIEW3D_PT_2_previewpath"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
@@ -117,7 +117,7 @@ class VIEW3D_PT_PreviewPath(bpy.types.Panel):
 
 class VIEW3D_PT_FilePath(bpy.types.Panel):
     bl_label = "Render Path Tool"
-    bl_idname = "VIEW3D_PT_filepath"
+    bl_idname = "VIEW3D_PT_3_filepath"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
