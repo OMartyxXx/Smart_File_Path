@@ -24,12 +24,12 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
         active_cam = scene.camera
 
         if not cameras:
-        layout.label(text="Aucune caméra dans la scène", icon='INFO')
+            layout.label(text="Aucune caméra dans la scène", icon='INFO')
         else:
             col = layout.column(align=True)
             for cam in cameras:
                 is_active = (cam == active_cam)
-                    row = col.row(align=True)
+                row = col.row(align=True)
                 icon = 'OUTLINER_OB_CAMERA' if is_active else 'CAMERA_DATA'
                 op = row.operator(
                     "camera.set_active_from_panel",
@@ -68,7 +68,7 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
                     row.label(text="Mist :", icon='WORLD')
                     row.label(text="propriétés non assignées", icon='ERROR')
 
-    # Toujours afficher les boutons Cam Rig (même sans cam dans la scène)
+        # Toujours afficher les boutons Cam Rig (même sans cam dans la scène)
         layout.separator()
         layout.operator("scene.create_camera_rig", icon='CAMERA_DATA')
         layout.operator("scene.set_camfrange", icon='KEYFRAME')
