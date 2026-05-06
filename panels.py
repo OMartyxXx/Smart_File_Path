@@ -9,6 +9,7 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
+    bl_order = 0
 
 
     def draw(self, context):
@@ -40,12 +41,37 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
             )
             op.camera_name = cam.name
 
+        if active_cam and active_cam.type == 'CAMERA':
+            cam_data = active_cam.data
+            box = layout.box()
+            box.label(text=f"Properties de {active_cam.name}", icon='PROPERTIES')
+
+            sub = box.column(align=True)
+
+            if "Frame Start" in cam_data and "Frame End" in cam_data:
+                fs = int(cam_data["Frame Start"])
+                fe = int(cam_data["Frame End"])
+                row = sub.row(align=True)
+                row.label(text="Frame Range :", icon='KEYFRAME')
+                row.label(text=f"{fs}  →  {fe}")
+
+            if "Mist Start" in cam_data and "Mist Depth" in cam_data:
+                ms = float(cam_data["Mist Start"])
+                md = float(cam_data["Mist Depth"])
+                row = sub.row(align=True)
+                row.label(text="Mist :", icon='WORLD')
+                row.label(text=f"{ms:.2f}m  →  {md:.2f}m")
+
+
+        
+
 class VIEW3D_PT_CamRigCreator(bpy.types.Panel):
     bl_label = "Create Cam Rig"
     bl_idname = "VIEW3D_PT_camrigcreator"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
+    bl_order = 1
 
     def draw(self, context):
         layout = self.layout
@@ -60,6 +86,7 @@ class VIEW3D_PT_PreviewPath(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
+    bl_order = 2
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
@@ -98,6 +125,7 @@ class VIEW3D_PT_FilePath(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "SmartPath"
+    bl_order = 3
     bl_options = {'DEFAULT_CLOSED'}
 
     def draw(self, context):
