@@ -12,23 +12,21 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
     bl_order = 0
 
 
-    def draw(self, context):
-        layout = self.layout
-        scene  = context.scene
+def draw(self, context):
+    layout = self.layout
+    scene  = context.scene
 
-        # Récupération des caméras de la scène, triées alphabétiquement
-        cameras = sorted(
-            [obj for obj in scene.objects if obj.type == 'CAMERA'],
-            key=lambda c: c.name.lower()
-        )
+    cameras = sorted(
+        [obj for obj in scene.objects if obj.type == 'CAMERA'],
+        key=lambda c: c.name.lower()
+    )
 
-        if not cameras:
-            layout.label(text="Aucune caméra dans la scène", icon='INFO')
-            return
+    active_cam = scene.camera
 
-        active_cam = scene.camera
+    if not cameras:
+        layout.label(text="Aucune caméra dans la scène", icon='INFO')
+    else:
         col = layout.column(align=True)
-
         for cam in cameras:
             is_active = (cam == active_cam)
             row = col.row(align=True)
@@ -54,6 +52,10 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
                 row = sub.row(align=True)
                 row.label(text="Frame Range :", icon='KEYFRAME')
                 row.label(text=f"{fs}  →  {fe}")
+            else:
+                row = sub.row(align=True)
+                row.label(text="Frame Range :", icon='KEYFRAME')
+                row.label(text="propriétés non assignées", icon='ERROR')
 
             if "Mist Start" in cam_data and "Mist Depth" in cam_data:
                 ms = float(cam_data["Mist Start"])
@@ -61,12 +63,16 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
                 row = sub.row(align=True)
                 row.label(text="Mist :", icon='WORLD')
                 row.label(text=f"{ms:.2f}m  →  {md:.2f}m")
+            else:
+                row = sub.row(align=True)
+                row.label(text="Mist :", icon='WORLD')
+                row.label(text="propriétés non assignées", icon='ERROR')
 
-        layout.separator()
-        layout.operator("scene.create_camera_rig", icon='CAMERA_DATA')
-        layout.operator("scene.set_camfrange", icon='KEYFRAME')
-        layout.operator("scene.set_mistpasse", icon='WORLD')
-
+    # Toujours afficher les boutons Cam Rig (même sans cam dans la scène)
+    layout.separator()
+    layout.operator("scene.create_camera_rig", icon='CAMERA_DATA')
+    layout.operator("scene.set_camfrange", icon='KEYFRAME')
+    layout.operator("scene.set_mistpasse", icon='WORLD')
 
 
 class VIEW3D_PT_PreviewPath(bpy.types.Panel):
