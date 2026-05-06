@@ -492,7 +492,9 @@ class CAMERA_OT_set_active(bpy.types.Operator):
 
         scene       = context.scene
         active_cam  = scene.camera
+        acd         = active_cam.data #nom plus court pour la vérif plus bas
         world       = scene.world
+
 
         mist_start  = camera_name.data["Mist Start"]
         mist_depth  = camera_name.data["Mist Depth"]
@@ -502,7 +504,7 @@ class CAMERA_OT_set_active(bpy.types.Operator):
 
         if cam_obj and cam_obj.type == 'CAMERA':
             
-            if "Mist Start" and "Mist Depth" and "Frame Start" and "Frame End" in active_cam.data:
+            if "Mist Start" in acd and "Mist Depth" in acd and "Frame Start" in acd and "Frame End" in acd:
 
                 world.mist_settings.start = mist_start
                 world.mist_settings.depth = mist_depth
