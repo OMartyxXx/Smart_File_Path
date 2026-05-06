@@ -255,6 +255,7 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
 
     def draw(self, context):
         scene  = context.scene
+        world  = scene.world
         layout = self.layout
         layout.scale_y = 1.2
 
@@ -263,10 +264,15 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
         layout.separator()
 
         # Lire les custom properties de la cam pour afficher les valeurs qui seront appliquées
+
+        if world is None:
+            self.report({'ERROR'}, "La scène ne contient pas de world")
+            return {'CANCELLED'}
+
         frame_start = scene.frame_start
         frame_end   = scene.frame_end
-        mist_start  = scene.world.mist_settings.start
-        mist_depth  = scene.world.mist_settings.depth
+        mist_start  = world.mist_settings.start
+        mist_depth  = world.mist_settings.depth
 
         frame_label = f"{frame_start}  →  {frame_end}"
         mist_label  = f"{mist_start}  →  {mist_depth}"
@@ -490,50 +496,37 @@ class CAMERA_OT_set_active(bpy.types.Operator):
     camera_name: bpy.props.StringProperty()
 
     def execute(self, context):
-        
+        scene   = context.scene
         cam_obj = bpy.data.objects.get(self.camera_name)
 
-        scene       = context.scene
-        active_cam  = scene.camera
-        
-        if world is None:
-            self.report({'WARNING'}, "Aucun world dans la scéne")
-            return {'CANCELLED'}
-
-        if active_cam id None:
-            self.report({'CANCELLED'}, "Aucune caméra active dans la scène")
-        
-        cod         = cam_obj.data #cod pour cam_object_data : nom plus court pour la vérif plus bas
-        world       = scene.world
-
-
-        mist_start  = camera_name.data["Mist Start"]
-        mist_depth  = camera_name.data["Mist Depth"]
-
-        frame_start = camera_name.data["Frame Start"]
-        frame_end   = camera_name.data["Frame End"]
-
-        if cam_obj and cam_obj.type == 'CAMERA':
-            
-            if "Mist Start" in acd and "Mist Depth" in acd and "Frame Start" in acd and "Frame End" in acd:
-
-                world.mist_settings.start = mist_start
-                world.mist_settings.depth = mist_depth
-
-                scene.frame_start = frame_start
-                scene.frame_end = frame_end
-
-                return {'FINISHED'}
-
-
-            active_cam = cam_obj
-            self.report({'INFO'}, f"Caméra active : {cam_obj.name}")
-
-            
-
-        else:
+        if not cam_obj or cam_obj.type != 'CAMERA':
             self.report({'WARNING'}, f"Caméra introuvable : {self.camera_name}")
             return {'CANCELLED'}
+
+        # Active la caméra
+        scene.camera = cam_obj
+
+        # Applique les custom properties de la cam vers la scène (si présentes)
+        cam_data = cam_obj.data
+        applied  = []
+
+        if "Frame Start" in cam_data and "Frame End" in cam_data:
+            scene.frame_start = int(cam_data["Frame Start"])
+            scene.frame_end   = int(cam_data["Frame End"])
+            applied.append(f"Frame Range {scene.frame_start} → {scene.frame_end}")
+
+        if "Mist Start" in cam_data and "Mist Depth" in cam_data:
+            if scene.world is None:
+                scene.world = bpy.data.worlds.new(name="World")
+            scene.world.mist_settings.start = float(cam_data["Mist Start"])
+            scene.world.mist_settings.depth = float(cam_data["Mist Depth"])
+            applied.append(f"Mist {scene.world.mist_settings.start}m → {scene.world.mist_settings.depth}m")
+
+        msg = f"Caméra active : {cam_obj.name}"
+        if applied:
+            msg += f" — {', '.join(applied)}"
+        self.report({'INFO'}, msg)
+
         return {'FINISHED'}
 
 
