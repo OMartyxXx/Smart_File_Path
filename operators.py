@@ -529,7 +529,52 @@ class CAMERA_OT_set_active(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class ADDCUSTOMPROPS_OT_add_custom_props(bpy.types.Operator):
+    bl_idname = "scene.add_cam_custom_props"
+    bl_label = "Ajouter les Custom Properties"
+    bl_description = "Rajoute les customs properties de Frame Range et Mist à la Cam Active"
 
+    def invoke(self, context, event):
+        return context.window_manager.invoke_props_dialog(self, width=420, confirm_text="Ajouter")
+
+    def draw(self, context):
+        layout = self.layout
+        layout.label(text="Rajoute les customs properties de Frame Range et Mist", icon='INFO')
+        layout.label(text="à la Cam Active avec les valeurs actuelles de la scène")
+
+    def execute(self, context):
+        scene     = context.scene
+        activecam = scene.camera
+
+        if activecam is None:
+            self.report({'WARNING'}, "Aucune caméra active dans la scène")
+            return {'CANCELLED'}
+
+        cam_data = activecam.data
+        world    = scene.world
+
+        # Récupère les valeurs de mist (avec fallback si pas de world)
+        mist_start = world.mist_settings.start if world else 0.0
+        mist_depth = world.mist_settings.depth if world else 25.0
+
+        # Création dans l'ordre inverse pour l'affichage UI :
+        # Frame Start → Frame End → Mist Start → Mist Depth
+        cam_data["Mist Depth"]  = mist_depth
+        cam_data["Mist Start"]  = mist_start
+        cam_data["Frame End"]   = scene.frame_end
+        cam_data["Frame Start"] = scene.frame_start
+
+        cam_data.id_properties_ui("Mist Depth").update(min=0.0, subtype="DISTANCE", description="Profondeur du mist")
+        cam_data.id_properties_ui("Mist Start").update(min=0.0, subtype="DISTANCE", description="Distance de début du mist")
+        cam_data.id_properties_ui("Frame End").update(min=0,    description="Frame de fin")
+        cam_data.id_properties_ui("Frame Start").update(min=0,  description="Frame de début")
+
+        cam_data.update_tag()
+        for area in context.screen.areas:
+            area.tag_redraw()
+
+        self.report({'INFO'}, f"Custom properties ajoutées sur {activecam.name}")
+        return {'FINISHED'}
 
 # ------------------------
 # OPERATORS — PREVIEW PATH
@@ -686,6 +731,7 @@ classes = (
     SETCAMFRAMERANGE_OT_set_camframerange,
     SETMISTPASSE_OT_set_mist_passe,
     CAMERA_OT_set_active,
+    ADDCUSTOMPROPS_OT_add_custom_props,
     GREYBOXRENDER_OT_set_greybox_path,
     GREYBOXRENDER_OT_wait_and_open,
     GREYBOXRENDER_OT_viewport_render_animation,

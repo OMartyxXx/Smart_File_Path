@@ -74,6 +74,14 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
         layout.operator("scene.set_camfrange", icon='KEYFRAME')
         layout.operator("scene.set_mistpasse", icon='WORLD')
 
+        # Bouton "Add Custom Properties" — seulement si la cam active n'a pas les properties
+        if active_cam and active_cam.type == 'CAMERA':
+            cam_data = active_cam.data
+            has_frame = "Frame Start" in cam_data and "Frame End" in cam_data
+            has_mist  = "Mist Start" in cam_data and "Mist Depth" in cam_data
+            if not (has_frame and has_mist):
+                layout.operator("scene.add_cam_custom_props", icon='ADD')
+
 
 class VIEW3D_PT_PreviewPath(bpy.types.Panel):
     bl_label = "Preview Path Tool"
