@@ -64,10 +64,11 @@ class UPDATEPATH_OT_set_render_path(bpy.types.Operator):
         scene.use_nodes = True
 
         settings = scene.render.image_settings
-        if settings.file_format != 'PNG' or settings.color_mode != 'RGBA':
+        if settings.file_format != 'PNG' or settings.color_mode != 'RGBA' or settings.color_depth != '16':
+            settings.color_depth = '16'
             settings.file_format = 'PNG'
             settings.color_mode  = 'RGBA'
-            self.report({'INFO'}, "Format forcé en PNG RGBA")
+            self.report({'INFO'}, "Format forcé en PNG RGBA 16-bits ")
 
         scene.render.filepath = final_path
         props.last_path       = final_path
@@ -155,6 +156,13 @@ def _deadline_send(operator, context):
     applied = _apply_camera_properties(context)
     for info in applied:
         operator.report({'INFO'}, f"Cam → Scène : {info}")
+
+    # Copie le nom du fichier dans le presse-papier (sans le chemin ni le _ final)
+    props = context.scene.filepath_fp_props
+    if props.last_path:
+        filename_only = os.path.basename(props.last_path.rstrip("_"))
+        context.window_manager.clipboard = filename_only
+        operator.report({'INFO'}, f"Nom copié : {filename_only}")
 
     bpy.ops.file.make_paths_absolute()
     try:
