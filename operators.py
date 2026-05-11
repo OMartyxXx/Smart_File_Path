@@ -133,17 +133,17 @@ def _apply_camera_properties(context):
     cam_data = activecam.data
 
     # Frame Range
-    if "Frame Start" in cam_data and "Frame End" in cam_data:
-        scene.frame_start = int(cam_data["Frame Start"])
-        scene.frame_end   = int(cam_data["Frame End"])
+    if "01 Frame Start" in cam_data and "02 Frame End" in cam_data:
+        scene.frame_start = int(cam_data["01 Frame Start"])
+        scene.frame_end   = int(cam_data["02 Frame End"])
         applied.append(f"Frame Range: {scene.frame_start} → {scene.frame_end}")
 
     # Mist
-    if "Mist Start" in cam_data and "Mist Depth" in cam_data:
+    if "03 Mist Start" in cam_data and "04 Mist Depth" in cam_data:
         if scene.world is None:
             scene.world = bpy.data.worlds.new(name="World")
-        scene.world.mist_settings.start = float(cam_data["Mist Start"])
-        scene.world.mist_settings.depth = float(cam_data["Mist Depth"])
+        scene.world.mist_settings.start = float(cam_data["03 Mist Start"])
+        scene.world.mist_settings.depth = float(cam_data["04 Mist Depth"])
         applied.append(f"Mist: {scene.world.mist_settings.start}m → {scene.world.mist_settings.depth}m")
 
     return applied
@@ -413,14 +413,14 @@ class CREATE_RIG_OT_camera_rig(bpy.types.Operator):
 
         # Création dans l'ordre inverse pour que l'UI affiche :
         # Frame Start → Frame End → Mist Start → Mist Depth
-        cam.data["Mist Depth"]  = 25.0
-        cam.data["Mist Start"]  = 0.0
-        cam.data["Frame End"]   = context.scene.frame_end
-        cam.data["Frame Start"] = context.scene.frame_start
-        cam.data.id_properties_ui("Mist Depth").update(min=0.0,  subtype="DISTANCE", description="Profondeur du mist")
-        cam.data.id_properties_ui("Mist Start").update(min=0.0,  subtype="DISTANCE", description="Distance de début du mist")
-        cam.data.id_properties_ui("Frame End").update(min=0,     description="Frame de fin")
-        cam.data.id_properties_ui("Frame Start").update(min=0,   description="Frame de début")
+        cam.data["01 Frame Start"] = context.scene.frame_start
+        cam.data["02 Frame End"]   = context.scene.frame_end
+        cam.data["03 Mist Start"]  = 0.0
+        cam.data["04 Mist Depth"]  = 25.0
+        cam.data.id_properties_ui("01 Frame Start").update(min=0,   description="Frame de début")
+        cam.data.id_properties_ui("02 Frame End").update(min=0,     description="Frame de fin")
+        cam.data.id_properties_ui("03 Mist Start").update(min=0.0,  subtype="DISTANCE", description="Distance de début du mist")
+        cam.data.id_properties_ui("04 Mist Depth").update(min=0.0,  subtype="DISTANCE", description="Profondeur du mist")
 
         for obj in [empty_root, empty_child, cam]:
             for col in list(obj.users_collection):
@@ -444,9 +444,9 @@ class SETCAMFRAMERANGE_OT_set_camframerange(bpy.types.Operator):
             self.report({'WARNING'}, "Aucune caméra active dans la scène")
             return {'CANCELLED'}
 
-        if "Frame Start" in activecam.data and "Frame End" in activecam.data:
-            activecam.data["Frame Start"] = scene.frame_start
-            activecam.data["Frame End"]   = scene.frame_end
+        if "01 Frame Start" in activecam.data and "02 Frame End" in activecam.data:
+            activecam.data["01 Frame Start"] = scene.frame_start
+            activecam.data["02 Frame End"]   = scene.frame_end
             activecam.data.update_tag()
             for area in context.screen.areas:
                 area.tag_redraw()
@@ -475,9 +475,9 @@ class SETMISTPASSE_OT_set_mist_passe(bpy.types.Operator):
             return {'CANCELLED'}
             
 
-        if "Mist Start" in activecam.data and "Mist Depth" in activecam.data:
-            activecam.data["Mist Start"] = world.mist_settings.start
-            activecam.data["Mist Depth"] = world.mist_settings.depth
+        if "03 Mist Start" in activecam.data and "04 Mist Depth" in activecam.data:
+            activecam.data["03 Mist Start"] = world.mist_settings.start
+            activecam.data["04 Mist Depth"] = world.mist_settings.depth
             activecam.data.update_tag()
             for area in context.screen.areas:
                 area.tag_redraw()
@@ -510,16 +510,16 @@ class CAMERA_OT_set_active(bpy.types.Operator):
         cam_data = cam_obj.data
         applied  = []
 
-        if "Frame Start" in cam_data and "Frame End" in cam_data:
-            scene.frame_start = int(cam_data["Frame Start"])
-            scene.frame_end   = int(cam_data["Frame End"])
+        if "01 Frame Start" in cam_data and "02 Frame End" in cam_data:
+            scene.frame_start = int(cam_data["01 Frame Start"])
+            scene.frame_end   = int(cam_data["02 Frame End"])
             applied.append(f"Frame Range {scene.frame_start} → {scene.frame_end}")
 
-        if "Mist Start" in cam_data and "Mist Depth" in cam_data:
+        if "03 Mist Start" in cam_data and "04 Mist Depth" in cam_data:
             if scene.world is None:
                 scene.world = bpy.data.worlds.new(name="World")
-            scene.world.mist_settings.start = float(cam_data["Mist Start"])
-            scene.world.mist_settings.depth = float(cam_data["Mist Depth"])
+            scene.world.mist_settings.start = float(cam_data["03 Mist Start"])
+            scene.world.mist_settings.depth = float(cam_data["04 Mist Depth"])
             applied.append(f"Mist {scene.world.mist_settings.start}m → {scene.world.mist_settings.depth}m")
 
         msg = f"Caméra active : {cam_obj.name}"
@@ -559,15 +559,15 @@ class ADDCUSTOMPROPS_OT_add_custom_props(bpy.types.Operator):
 
         # Création dans l'ordre inverse pour l'affichage UI :
         # Frame Start → Frame End → Mist Start → Mist Depth
-        cam_data["Mist Depth"]  = mist_depth
-        cam_data["Mist Start"]  = mist_start
-        cam_data["Frame End"]   = scene.frame_end
-        cam_data["Frame Start"] = scene.frame_start
+        cam_data["01 Frame Start"] = scene.frame_start
+        cam_data["02 Frame End"]   = scene.frame_end
+        cam_data["03 Mist Start"]  = mist_start
+        cam_data["04 Mist Depth"]  = mist_depth
 
-        cam_data.id_properties_ui("Mist Depth").update(min=0.0, subtype="DISTANCE", description="Profondeur du mist")
-        cam_data.id_properties_ui("Mist Start").update(min=0.0, subtype="DISTANCE", description="Distance de début du mist")
-        cam_data.id_properties_ui("Frame End").update(min=0,    description="Frame de fin")
-        cam_data.id_properties_ui("Frame Start").update(min=0,  description="Frame de début")
+        cam_data.id_properties_ui("01 Frame Start").update(min=0,   description="Frame de début")
+        cam_data.id_properties_ui("02 Frame End").update(min=0,     description="Frame de fin")
+        cam_data.id_properties_ui("03 Mist Start").update(min=0.0,  subtype="DISTANCE", description="Distance de début du mist")
+        cam_data.id_properties_ui("04 Mist Depth").update(min=0.0,  subtype="DISTANCE", description="Profondeur du mist")
 
         cam_data.update_tag()
         for area in context.screen.areas:

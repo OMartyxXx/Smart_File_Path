@@ -46,9 +46,9 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
 
                 sub = box.column(align=True)
 
-                if "Frame Start" in cam_data and "Frame End" in cam_data:
-                    fs = int(cam_data["Frame Start"])
-                    fe = int(cam_data["Frame End"])
+                if "01 Frame Start" in cam_data and "02 Frame End" in cam_data:
+                    fs = int(cam_data["01 Frame Start"])
+                    fe = int(cam_data["02 Frame End"])
                     row = sub.row(align=True)
                     row.label(text="Frame Range :", icon='KEYFRAME')
                     row.label(text=f"{fs}  →  {fe}")
@@ -57,9 +57,9 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
                     row.label(text="Frame Range :", icon='KEYFRAME')
                     row.label(text="propriétés non assignées", icon='ERROR')
 
-                if "Mist Start" in cam_data and "Mist Depth" in cam_data:
-                    ms = float(cam_data["Mist Start"])
-                    md = float(cam_data["Mist Depth"])
+                if "03 Mist Start" in cam_data and "04 Mist Depth" in cam_data:
+                    ms = float(cam_data["03 Mist Start"])
+                    md = float(cam_data["04 Mist Depth"])
                     row = sub.row(align=True)
                     row.label(text="Mist :", icon='WORLD')
                     row.label(text=f"{ms:.2f}m  →  {md:.2f}m")
@@ -77,8 +77,8 @@ class VIEW3D_PT_camera_switcher(bpy.types.Panel):
         # Bouton "Add Custom Properties" — seulement si la cam active n'a pas les properties
         if active_cam and active_cam.type == 'CAMERA':
             cam_data = active_cam.data
-            has_frame = "Frame Start" in cam_data and "Frame End" in cam_data
-            has_mist  = "Mist Start" in cam_data and "Mist Depth" in cam_data
+            has_frame = "01 Frame Start" in cam_data and "02 Frame End" in cam_data
+            has_mist  = "03 Mist Start" in cam_data and "04 Mist Depth" in cam_data
             if not (has_frame and has_mist):
                 layout.operator("scene.add_cam_custom_props", icon='ADD')
 
