@@ -275,7 +275,7 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
         mist_depth  = world.mist_settings.depth
 
         frame_label = f"{frame_start}  →  {frame_end}"
-        mist_label  = f"{mist_start}  →  {mist_depth}"
+        mist_label  = f"{mist_start:.2f}  →  {mist_depth:.2f}"
         
         col = layout.column(align=True)
 
@@ -289,10 +289,9 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
         
         info_row(col, "Frame Range :",   frame_label,                                                                'KEYFRAME')
         info_row(col, "Mist:",   mist_label,                                                                'WORLD')
+        col.separator()
         info_row(col, "Frame Rate :",    f"{scene.render.fps} fps",                                                  'TIME')
-        col.separator()
         info_row(col, "Résolution :",    f"{scene.render.resolution_x} x {scene.render.resolution_y}  ({scene.render.resolution_percentage} %)", 'RESTRICT_RENDER_OFF')
-        col.separator()
 
         engine = scene.render.engine
         if engine == 'CYCLES':
@@ -302,6 +301,7 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
             samples = "—"
             denoise = "—"
 
+        col.separator()
         info_row(col, "Samples :",  str(samples), 'SHADERFX')
         info_row(col, "Denoise :",  denoise,       'OUTLINER_OB_LIGHTPROBE')
 
