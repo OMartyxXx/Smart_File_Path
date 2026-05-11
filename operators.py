@@ -304,6 +304,15 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
 
         info_row(col, "Samples :",  str(samples), 'SHADERFX')
         info_row(col, "Denoise :",  denoise,       'OUTLINER_OB_LIGHTPROBE')
+
+        # Motion Blur (Cycles uniquement)
+        if engine == 'CYCLES':
+            motion_blur = "On" if scene.render.use_motion_blur else "Off"
+        else:
+            motion_blur = "—"
+
+        info_row(col, "Motion Blur :", motion_blur, 'ONIONSKIN_ON')
+
         col.separator()
 
         cm = scene.view_settings
@@ -505,6 +514,11 @@ class CAMERA_OT_set_active(bpy.types.Operator):
 
         # Active la caméra
         scene.camera = cam_obj
+
+        # Sélectionne la cam dans la scène
+        bpy.ops.object.select_all(action='DESELECT')
+        cam_obj.select_set(True)
+        context.view_layer.objects.active = cam_obj
 
         # Applique les custom properties de la cam vers la scène (si présentes)
         cam_data = cam_obj.data
