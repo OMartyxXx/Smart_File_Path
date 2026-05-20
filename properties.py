@@ -24,9 +24,19 @@ def update_resolution(self, context):
 
 @bpy.app.handlers.persistent
 def sync_resolution_on_load(dummy):
+    """Au chargement, lit la résolution de la scène et synchronise l'enum SI elle matche un preset."""
     for scene in bpy.data.scenes:
-        if hasattr(scene, "filepath_fp_props"):
-            apply_resolution(scene, scene.filepath_fp_props.resolution)
+        if not hasattr(scene, "filepath_fp_props"):
+            continue
+        x = scene.render.resolution_x
+        y = scene.render.resolution_y
+        # Cherche si la résolution actuelle correspond à un preset
+        for key, (rx, ry) in RESOLUTIONS.items():
+            if x == rx and y == ry:
+                # Met à jour l'enum sans déclencher le callback update_resolution
+                scene.filepath_fp_props["resolution"] = list(RESOLUTIONS.keys()).index(key)
+                break
+        # Sinon : on ne touche à rien, la résolution custom est conservée
 
 
 # ------------------------
