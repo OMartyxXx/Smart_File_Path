@@ -65,9 +65,9 @@ class UPDATEPATH_OT_set_render_path(bpy.types.Operator):
 
         settings = scene.render.image_settings
         if settings.file_format != 'PNG' or settings.color_mode != 'RGBA' or settings.color_depth != '16':
-            settings.color_depth = '16'
-            settings.file_format = 'PNG'
+            settings.file_format = 'PNG'   # doit être défini EN PREMIER pour débloquer color_depth '16'
             settings.color_mode  = 'RGBA'
+            settings.color_depth = '16'
             self.report({'INFO'}, "Format forcé en PNG RGBA 16-bits ")
 
         scene.render.filepath = final_path
