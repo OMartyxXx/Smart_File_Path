@@ -91,19 +91,29 @@ class UPDATEPATH_OT_set_render_path(bpy.types.Operator):
             bpy.ops.updatepath.missing_nodes_popup('INVOKE_DEFAULT', missing_nodes=", ".join(missing))
 
         # --- Renommage des File Subpaths du node File Output nommé "PNG_RENDER" ---
-        # Si un node File Output a pour nom "PNG_RENDER",
-        # on renomme tous ses file_slots avec : client_projet_NomDeLaCamera
-        new_subpath   = f"{props.filename}_{cam}"
+        # Format : filename_cam_PASS_V01_  (PASS = RGBA ou SHADOW selon le nom actuel du slot)
+        version_str   = f"V{props.version:02d}"
         renamed_count = 0
 
         for node in scene.node_tree.nodes:
             if node.type == 'OUTPUT_FILE' and node.name == "PNG_RENDER":
                 for file_slot in node.file_slots:
-                    file_slot.path = new_subpath
+                    current = file_slot.path.upper()
+                    if "RGBA" in current:
+                        pass_tag = "RGBA"
+                    elif "SHADOW" in current:
+                        pass_tag = "SHADOW"
+                    else:
+                        pass_tag = None
+
+                    if pass_tag:
+                        file_slot.path = f"{props.filename}_{cam}_{pass_tag}_{version_str}_"
+                    else:
+                        file_slot.path = f"{props.filename}_{cam}_{version_str}_"
                     renamed_count += 1
 
         if renamed_count:
-            self.report({'INFO'}, f"PNG_RENDER : {renamed_count} subpath(s) renommé(s) → {new_subpath}")
+            self.report({'INFO'}, f"PNG_RENDER : {renamed_count} subpath(s) renommé(s)")
 
         self.report({'INFO'}, f"Chemin appliqué : {final_path}")
         return {'FINISHED'}
