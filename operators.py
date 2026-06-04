@@ -90,13 +90,14 @@ class UPDATEPATH_OT_set_render_path(bpy.types.Operator):
         if missing:
             bpy.ops.updatepath.missing_nodes_popup('INVOKE_DEFAULT', missing_nodes=", ".join(missing))
 
-        # --- Renommage des File Subpaths du node File Output nommé "PNG_RENDER" ---
-        # Format : filename_cam_PASS_V01_  (PASS = RGBA ou SHADOW selon le nom actuel du slot)
+        # --- Node PNG_RENDER : base_path + renommage des File Subpaths ---
+        # Format subpath : filename_cam_PASS_V01_  (PASS = RGBA ou SHADOW selon le nom actuel du slot)
         version_str   = f"V{props.version:02d}"
         renamed_count = 0
 
         for node in scene.node_tree.nodes:
             if node.type == 'OUTPUT_FILE' and node.name == "PNG_RENDER":
+                node.base_path = abs_filepath  # <-- rempli le Folder du File Output
                 for file_slot in node.file_slots:
                     current = file_slot.path.upper()
                     if "RGBA" in current:
