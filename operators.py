@@ -90,6 +90,21 @@ class UPDATEPATH_OT_set_render_path(bpy.types.Operator):
         if missing:
             bpy.ops.updatepath.missing_nodes_popup('INVOKE_DEFAULT', missing_nodes=", ".join(missing))
 
+        # --- Renommage des File Subpaths du node File Output nommé "PNG_RENDER" ---
+        # Si un node File Output a pour nom "PNG_RENDER",
+        # on renomme tous ses file_slots avec : client_projet_NomDeLaCamera
+        new_subpath   = f"{props.filename}_{cam}"
+        renamed_count = 0
+
+        for node in scene.node_tree.nodes:
+            if node.type == 'OUTPUT_FILE' and node.name == "PNG_RENDER":
+                for file_slot in node.file_slots:
+                    file_slot.path = new_subpath
+                    renamed_count += 1
+
+        if renamed_count:
+            self.report({'INFO'}, f"PNG_RENDER : {renamed_count} subpath(s) renommé(s) → {new_subpath}")
+
         self.report({'INFO'}, f"Chemin appliqué : {final_path}")
         return {'FINISHED'}
 
