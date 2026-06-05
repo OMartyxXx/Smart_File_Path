@@ -630,8 +630,8 @@ class ADDCUSTOMPROPS_OT_add_custom_props(bpy.types.Operator):
 
 class GREYBOXRENDER_OT_set_greybox_path(bpy.types.Operator):
     bl_idname = "greyboxrender.set_greybox_path"
-    bl_label = "Apply Preview Path"
-    bl_description = "Applique le chemin de preview (MP4, pas de compositor)"
+    bl_label = "Apply Preview Path (MP4)"
+    bl_description = "Applique le chemin de preview en MP4 (pas de compositor)"
 
     def execute(self, context):
         props = context.scene.filepath_fp_props
@@ -656,7 +656,39 @@ class GREYBOXRENDER_OT_set_greybox_path(bpy.types.Operator):
         scene.render.filepath  = preview_path
         props.last_previewpath = preview_path
 
-        self.report({'INFO'}, f"Preview path appliqué : {preview_path}")
+        self.report({'INFO'}, f"Preview path appliqué (MP4) : {preview_path}")
+        return {'FINISHED'}
+
+
+class GREYBOXRENDER_OT_set_greybox_path_png(bpy.types.Operator):
+    bl_idname = "greyboxrender.set_greybox_path_png"
+    bl_label = "Apply Preview Path (PNG)"
+    bl_description = "Applique le chemin de preview en PNG RGBA 16-bits (pas de compositor)"
+
+    def execute(self, context):
+        props = context.scene.filepath_fp_props
+        scene = context.scene
+
+        previewcam     = scene.camera.name if scene.camera else "NoCam"
+        previewversion = f"V{props.Preview_version:02d}"
+        preview_path   = os.path.join(
+            props.Preview_filepath,
+            f"{props.Preview_filename}_Preview_{previewcam}_{previewversion}_"
+        )
+
+        scene.use_nodes = False
+
+        settings = scene.render.image_settings
+        if settings.file_format != 'PNG' or settings.color_mode != 'RGBA' or settings.color_depth != '16':
+            settings.file_format = 'PNG'
+            settings.color_mode  = 'RGBA'
+            settings.color_depth = '16'
+            self.report({'INFO'}, "Format forcé en PNG RGBA 16-bits")
+
+        scene.render.filepath  = preview_path
+        props.last_previewpath = preview_path
+
+        self.report({'INFO'}, f"Preview path appliqué (PNG) : {preview_path}")
         return {'FINISHED'}
 
 
@@ -781,6 +813,7 @@ classes = (
     CAMERA_OT_set_active,
     ADDCUSTOMPROPS_OT_add_custom_props,
     GREYBOXRENDER_OT_set_greybox_path,
+    GREYBOXRENDER_OT_set_greybox_path_png,
     GREYBOXRENDER_OT_wait_and_open,
     GREYBOXRENDER_OT_viewport_render_animation,
     UPDATEPREVIEWPATH_OT_open_previewfolder,
