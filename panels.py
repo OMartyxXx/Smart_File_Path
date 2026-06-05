@@ -106,7 +106,9 @@ class VIEW3D_PT_PreviewPath(bpy.types.Panel):
             row.label(text="Version")
             row.prop(props, "Preview_version", text="")
 
-            pbox.operator("greyboxrender.set_greybox_path", icon='FILE_TICK')
+            row = pbox.row(align=True)
+            row.operator("greyboxrender.set_greybox_path",     text="Apply Preview (MP4)", icon='FILE_MOVIE')
+            row.operator("greyboxrender.set_greybox_path_png", text="Apply Preview (PNG)", icon='IMAGE_DATA')
 
             sub = pbox.box()
             sub.label(text="Output Preview")
