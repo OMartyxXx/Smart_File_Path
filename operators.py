@@ -212,7 +212,7 @@ def _check_missing_paths(context):
     if not props.last_path.strip():
         missing.append("Output Render (Apply Path jamais utilisé)")
 
-    if scene.use_nodes and scene.node_tree:
+   if scene.use_nodes and scene.compositing_node_tree:
         nodeEXR    = scene.node_tree.nodes.get("EXR")
         nodeCrypto = scene.node_tree.nodes.get("CRYPTO")
         if nodeEXR and not nodeEXR.base_path.strip():
