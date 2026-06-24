@@ -78,12 +78,14 @@ class UPDATEPATH_OT_set_render_path(bpy.types.Operator):
         missing    = []
 
         if nodeEXR:
-            nodeEXR.base_path = final_path
+            nodeEXR.directory = os.path.dirname(final_path)
+            nodeEXR.file_name  = os.path.basename(final_path)
         else:
             missing.append("EXR")
 
         if nodeCrypto:
-            nodeCrypto.base_path = final_path + "CRYPTO_"
+            nodeCrypto.directory = os.path.dirname(final_path)
+            nodeCrypto.file_name  = os.path.basename(final_path) + "CRYPTO_"
         else:
             missing.append("CRYPTO")
 
@@ -97,9 +99,9 @@ class UPDATEPATH_OT_set_render_path(bpy.types.Operator):
 
         for node in scene.compositing_node_group.nodes:
             if node.type == 'OUTPUT_FILE' and node.name == "PNG_RENDER":
-                node.base_path = abs_filepath  # <-- rempli le Folder du File Output
-                for file_slot in node.file_slots:
-                    current = file_slot.path.upper()
+                node.directory = abs_filepath  # <-- rempli le Folder du File Output
+                for item in node.file_output_items:
+                    current = item.name.upper()
                     if "RGBA" in current:
                         pass_tag = "RGBA"
                     elif "SHADOW" in current:
@@ -108,9 +110,9 @@ class UPDATEPATH_OT_set_render_path(bpy.types.Operator):
                         pass_tag = None
 
                     if pass_tag:
-                        file_slot.path = f"{props.filename}_{cam}_{pass_tag}_{version_str}_"
+                        item.name = f"{props.filename}_{cam}_{pass_tag}_{version_str}_"
                     else:
-                        file_slot.path = f"{props.filename}_{cam}_{version_str}_"
+                        item.name = f"{props.filename}_{cam}_{version_str}_"
                     renamed_count += 1
 
         if renamed_count:
@@ -215,10 +217,10 @@ def _check_missing_paths(context):
     if scene.use_nodes and scene.compositing_node_group:
         nodeEXR    = scene.compositing_node_group.nodes.get("EXR")
         nodeCrypto = scene.compositing_node_group.nodes.get("CRYPTO")
-        if nodeEXR and not nodeEXR.base_path.strip():
-            missing.append("Node EXR (base_path vide)")
-        if nodeCrypto and not nodeCrypto.base_path.strip():
-            missing.append("Node CRYPTO (base_path vide)")
+        if nodeEXR and not nodeEXR.directory.strip():
+            missing.append("Node EXR (directory vide)")
+        if nodeCrypto and not nodeCrypto.directory.strip():
+            missing.append("Node CRYPTO (directory vide)")
 
     return missing
 
@@ -362,9 +364,9 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
             nodeEXR    = scene.compositing_node_group.nodes.get("EXR")
             nodeCrypto = scene.compositing_node_group.nodes.get("CRYPTO")
             if nodeEXR:
-                exr_path = nodeEXR.base_path or "— vide —"
+                exr_path = nodeEXR.directory or "— vide —"
             if nodeCrypto:
-                crypto_path = nodeCrypto.base_path or "— vide —"
+                crypto_path = nodeCrypto.directory or "— vide —"
 
         info_row(col, "EXR :",    exr_path,    'FILE_IMAGE')
         info_row(col, "CRYPTO :", crypto_path, 'NODE_COMPOSITING')
