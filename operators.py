@@ -73,8 +73,8 @@ class UPDATEPATH_OT_set_render_path(bpy.types.Operator):
         scene.render.filepath = final_path
         props.last_path       = final_path
 
-        nodeEXR    = scene.compositing_node_tree.nodes.get("EXR")
-        nodeCrypto = scene.compositing_node_tree.nodes.get("CRYPTO")
+        nodeEXR    = scene.compositing_node_group.nodes.get("EXR")
+        nodeCrypto = scene.compositing_node_group.nodes.get("CRYPTO")
         missing    = []
 
         if nodeEXR:
@@ -95,7 +95,7 @@ class UPDATEPATH_OT_set_render_path(bpy.types.Operator):
         version_str   = f"V{props.version:02d}"
         renamed_count = 0
 
-        for node in scene.compositing_node_tree.nodes:
+        for node in scene.compositing_node_group.nodes:
             if node.type == 'OUTPUT_FILE' and node.name == "PNG_RENDER":
                 node.base_path = abs_filepath  # <-- rempli le Folder du File Output
                 for file_slot in node.file_slots:
@@ -212,9 +212,9 @@ def _check_missing_paths(context):
     if not props.last_path.strip():
         missing.append("Output Render (Apply Path jamais utilisé)")
 
-    if scene.use_nodes and scene.compositing_node_tree:
-        nodeEXR    = scene.compositing_node_tree.nodes.get("EXR")
-        nodeCrypto = scene.compositing_node_tree.nodes.get("CRYPTO")
+    if scene.use_nodes and scene.compositing_node_group:
+        nodeEXR    = scene.compositing_node_group.nodes.get("EXR")
+        nodeCrypto = scene.compositing_node_group.nodes.get("CRYPTO")
         if nodeEXR and not nodeEXR.base_path.strip():
             missing.append("Node EXR (base_path vide)")
         if nodeCrypto and not nodeCrypto.base_path.strip():
@@ -358,9 +358,9 @@ class SEND_OT_deadline_summary(bpy.types.Operator):
 
         exr_path    = "— node introuvable —"
         crypto_path = "— node introuvable —"
-        if scene.use_nodes and scene.compositing_node_tree:
-            nodeEXR    = scene.compositing_node_tree.nodes.get("EXR")
-            nodeCrypto = scene.compositing_node_tree.nodes.get("CRYPTO")
+        if scene.use_nodes and scene.compositing_node_group:
+            nodeEXR    = scene.compositing_node_group.nodes.get("EXR")
+            nodeCrypto = scene.compositing_node_group.nodes.get("CRYPTO")
             if nodeEXR:
                 exr_path = nodeEXR.base_path or "— vide —"
             if nodeCrypto:
